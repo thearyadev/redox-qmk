@@ -130,7 +130,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 uint16_t last_send = 0;
 
 void matrix_scan_user(void) {
-    if (timer_elapsed(last_send) > 200) {
+    if (timer_elapsed(last_send) > 50) {
         uint8_t payload[32] = {0};
         payload[0] = current_layer;
         host_raw_hid_send(payload, sizeof(payload));

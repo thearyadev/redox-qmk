@@ -1,0 +1,22 @@
+pkgname=kb-writelayer
+pkgver=1.0.0
+pkgrel=11
+pkgdesc="reads the layer info from hid raw for your qmk keyboard"
+arch=('x86_64')
+license=('WTFPL')
+depends=('hidapi')
+makedepends=('gcc' 'make')
+source=()
+sha256sums=()
+
+build() {
+	cd ..
+	make
+}
+
+package() {
+	cd ..
+	install -Dm755 kb-writelayer "$pkgdir/usr/bin/kb-writelayer"
+	rm -r kb-writelayer
+}
+
