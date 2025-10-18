@@ -16,6 +16,7 @@ static const int SIGNATURE[] = {0, 0, 1, 1, 2, 1};
 static const int SIGLEN = 6;
 unsigned int vid = 0;
 unsigned int pid = 0;
+bool lastWindowIsOverwatch = false;
 
 hid_device *hid_dev = NULL;
 
@@ -71,18 +72,33 @@ void request_layer_switch(unsigned int layer) {
 }
 
 static void handle(const char *line) {
-  static const char prefix[] = "activewindow>>";
-  static const char target[] = "Overwatch";
-  enum { plen = sizeof prefix - 1, tlen = sizeof target - 1 };
+  static const char PREFIX[] = "activewindow>>";
+  static const char TARGET[] = "Overwatch";
+  enum { PREFIX_LEN = sizeof(PREFIX) - 1, TARGET_LEN = sizeof(TARGET) - 1 };
 
-  size_t len = strlen(line);
-  if (len < plen)
-    return;
-  if (memcmp(line, prefix, plen) != 0)
+  if (!line)
     return;
 
-  const char *last = line + len - tlen;
-  request_layer_switch(memcmp(last, target, tlen) == 0 ? 3 : 0);
+  size_t line_len = strlen(line);
+  if (line_len < PREFIX_LEN)
+    return;
+  if (memcmp(line, PREFIX, PREFIX_LEN) != 0)
+    return;
+
+  bool is_overwatch =
+      (line_len >= TARGET_LEN &&
+       memcmp(line + line_len - TARGET_LEN, TARGET, TARGET_LEN) == 0);
+
+  int target_layer = is_overwatch ? 3 : 0;
+
+  // Transition logic
+  if (is_overwatch && !lastWindowIsOverwatch) {
+    request_layer_switch(target_layer);
+    lastWindowIsOverwatch = true;
+  } else if (!is_overwatch && lastWindowIsOverwatch) {
+    request_layer_switch(target_layer);
+    lastWindowIsOverwatch = false;
+  }
 }
 
 void cleanup(int sig) {

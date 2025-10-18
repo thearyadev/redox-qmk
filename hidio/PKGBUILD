@@ -1,6 +1,6 @@
 pkgname=kb-writelayer
 pkgver=1.0.0
-pkgrel=13
+pkgrel=14
 pkgdesc="reads the layer info from hid raw for your qmk keyboard"
 arch=('x86_64')
 license=('WTFPL')
